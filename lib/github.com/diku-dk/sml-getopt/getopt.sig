@@ -16,15 +16,15 @@ sig
   | OPT_ARG of (string option -> 'a) * string
 
   (* Each opt_descr describes a single option.
-
+  
      The fields are:
-
+  
        - short: list of short option characters
-
+  
        - long: list of long option strings (without "--")
-
+  
        - arg: argument descriptor
-
+  
        - desc: explanation of option for user
   *)
   type 'a opt_descr =
@@ -33,18 +33,18 @@ sig
   (* Produce a summary of the available options. *)
   val usage: 'a opt_descr list -> string
 
-(* Process the command-line, and return the list of values that
-matched (and those that didn't). The arguments are:
-
-    - The order requirements (see arg_order)
-
-    - The option descriptions (see opt_descr)
-
-    - The actual command line arguments (presumably got from CommandLine.arguments).
-
-getOpt returns a triple consisting of the option arguments, a list of
-non-options, and a list of error messages.
-*)
+  (* Process the command-line, and return the list of values that
+  matched (and those that didn't). The arguments are:
+  
+      - The order requirements (see arg_order)
+  
+      - The option descriptions (see opt_descr)
+  
+      - The actual command line arguments (presumably got from CommandLine.arguments).
+  
+  getOpt returns a triple consisting of the option arguments, a list of
+  non-options, and a list of error messages.
+  *)
   val getopt: 'a arg_order
               -> 'a opt_descr list
               -> string list

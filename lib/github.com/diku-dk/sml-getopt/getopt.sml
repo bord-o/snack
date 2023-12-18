@@ -33,7 +33,7 @@ struct
         else if String.sub (s, i) = c then
           (String.substring (s, 0, i), String.substring (s, i, n - i))
         else
-          loop (i+1)
+          loop (i + 1)
     in
       loop 0
     end
@@ -67,7 +67,7 @@ struct
     | fmtLong (OPT_ARG (_, ad)) lo =
         "--" ^ lo ^ "[=" ^ ad ^ "]"
 
-  fun fmtOpt ({short=sos, long=los, arg=ad, desc}) =
+  fun fmtOpt ({short = sos, long = los, arg = ad, desc}) =
     let
       fun sepBy _ [] = ""
         | sepBy _ [x] = x
@@ -105,8 +105,8 @@ struct
 
 
   fun errAmbig ods optStr =
-    OPT_ERR ("Option '" ^ optStr ^ "' is ambiguous; could be one of:\n\n" ^
-             usage ods)
+    OPT_ERR
+      ("Option '" ^ optStr ^ "' is ambiguous; could be one of:\n\n" ^ usage ods)
 
   fun errReq d optStr =
     OPT_ERR ("Option '" ^ optStr ^ "' requires an argument " ^ d ^ "\n")
@@ -118,17 +118,17 @@ struct
 
   fun longOpt ls rs optDescr =
     let
-        val (opt, arg) = splitOn #"=" ls
+      val (opt, arg) = splitOn #"=" ls
       fun getWith p =
-        List.filter (fn o_ => List.find (p opt) (#long o_) <> NONE)
-          optDescr
+        List.filter (fn o_ => List.find (p opt) (#long o_) <> NONE) optDescr
       val exact = getWith (curry (op=))
       val options = if null exact then getWith String.isPrefix else exact
       val ads = map (fn o_ => #arg o_) options
       val optStr = "--" ^ opt
       fun long (_ :: _ :: _) _ rest =
             (errAmbig options optStr, rest)
-        | long [NO_ARG f] [] rest = (OPT (f ()), rest)
+        | long [NO_ARG f] [] rest =
+            (OPT (f ()), rest)
         | long [NO_ARG _] (#"=" :: _) rest = (errNoArg optStr, rest)
         | long [REQ_ARG (_, d)] [] [] =
             (errReq d optStr, [])
@@ -149,15 +149,15 @@ struct
   fun shortOpt y ys rs optDescr =
     let
       val options =
-        List.filter
-          (fn o_ => isSome (List.find (fn c => c = y) (#short o_)))
+        List.filter (fn o_ => isSome (List.find (fn c => c = y) (#short o_)))
           optDescr
       val ads = map (fn o_ => #arg o_) options
       val optStr = "-" ^ str y
 
       fun short (_ :: _ :: _) _ rest =
             (errAmbig options optStr, rest)
-        | short (NO_ARG f :: _) [] rest = (OPT (f ()), rest)
+        | short (NO_ARG f :: _) [] rest =
+            (OPT (f ()), rest)
         | short (NO_ARG f :: _) xs rest =
             (OPT (f ()), ("-" ^ implode xs) :: rest)
         | short (REQ_ARG (_, d) :: _) [] [] =
@@ -192,7 +192,7 @@ struct
   fun getopt' _ _ [] = ([], [], [], [])
     | getopt' ordering optDescr (arg :: args) =
         let
-            val (opt, rest) = getNext arg args optDescr
+          val (opt, rest) = getNext arg args optDescr
           val (os, xs, us, es) = getopt' ordering optDescr rest
           fun procNextOpt (OPT opt) _ = (opt :: os, xs, us, es)
             | procNextOpt (UNREQ_OPT u) _ = (os, xs, u :: us, es)
