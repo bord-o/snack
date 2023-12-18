@@ -1,6 +1,6 @@
 run: build
-	chmod +x ./_build/smlacker && cd ./_build && ./smlacker
+	chmod +x ./_build/snack && cd ./_build && ./snack
 
 build:
-	mlton -output ./_build/smlacker ./src/smlacker.mlb 
+	mlton -output ./_build/snack ./src/snack.mlb 
 	
