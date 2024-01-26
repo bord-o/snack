@@ -2,7 +2,6 @@ structure Snack =
 struct
   open Cli
   structure FS = OS.FileSys
-  datatype template = Cli | Compiler
 
   fun allFiles dir =
     let
@@ -28,26 +27,53 @@ struct
     end
 
   fun createTemplate t =
-    let
-      val () = FS.mkDir "./_build";
-      val () = FS.mkDir "./src";
-      val mainFile = TextIO.openOut "./src/main.sml"
-      val mlbFile = TextIO.openOut "./src/main.mlb"
-      val makeFile = TextIO.openOut "./makefile"
-    in
-      ( TextIO.output (mainFile, "val _ = print \"Hello World!\"")
-      ; TextIO.output
-          (mlbFile, "local $(SML_LIB)/basis/basis.mlb\nin\nmain.sml\nend")
-      ; TextIO.output
-          ( makeFile
-          , "run: build\n\tchmod +x ./_build/main && cd ./_build && ./main\nbuild:\n\tmlton -output ./_build/main ./src/main.mlb"
+    case t of
+      Cli => 
+        let
+          
+          val () = FS.mkDir "./_build";
+          val () = FS.mkDir "./src";
+          val mainFile = TextIO.openOut "./src/main.sml"
+          val mlbFile = TextIO.openOut "./src/main.mlb"
+          val makeFile = TextIO.openOut "./makefile"
+        in
+          (  print "Creating CLI template...\n\n"
+          ; TextIO.output (mainFile, Templates.Cli.mainFile)
+          ; TextIO.output (mlbFile, Templates.Cli.mlbFile)
+          ; TextIO.output ( makeFile, Templates.Cli.makeFile)
+
+          ; TextIO.closeOut mainFile
+          ; TextIO.closeOut mlbFile
+          ; TextIO.closeOut makeFile
+          ; ()
           )
-      ; TextIO.closeOut mainFile
-      ; TextIO.closeOut mlbFile
-      ; TextIO.closeOut makeFile
-      ; ()
-      )
-    end
+        end
+       | Compiler => 
+        let
+          
+          val () = FS.mkDir "./_build";
+          val () = FS.mkDir "./src";
+          val mainFile = TextIO.openOut "./src/main.sml"
+          val mlbFile = TextIO.openOut "./src/main.mlb"
+          val makeFile = TextIO.openOut "./makefile"
+          val grmFile = TextIO.openOut "./src/main.lex"
+          val lexFile = TextIO.openOut "./src/main.grm"
+        in
+          (  print "Creating Compiler template...\n\n"
+          ; TextIO.output (mainFile, Templates.Compiler.mainFile)
+          ; TextIO.output (mlbFile, Templates.Compiler.mlbFile)
+          ; TextIO.output ( makeFile, Templates.Compiler.makeFile)
+          ; TextIO.output ( grmFile, Templates.Compiler.grmFile)
+          ; TextIO.output ( lexFile, Templates.Compiler.lexFile)
+
+          ; TextIO.closeOut mainFile
+          ; TextIO.closeOut mlbFile
+          ; TextIO.closeOut makeFile
+          ; TextIO.closeOut grmFile
+          ; TextIO.closeOut lexFile
+          ; ()
+          )
+        end
 
   (*
   	run mlton on main.mlb whenever a file in ./src/ is modified
@@ -70,8 +96,8 @@ struct
         (wait (); watchLoop dir fileMods)
     end
 
-  fun run Init cfg =
-        (print "Creating CLI template...\n\n"; createTemplate Cli)
+  val c = Compiler
+  fun run Init cfg = createTemplate (#template_type cfg)
     | run Watch cfg =
         (print "Starting recompile loop...\n\n"; watchLoop (#path cfg) [])
 
@@ -89,6 +115,8 @@ struct
 
 end
 val () =
-  Snack.main ()
-  handle _ => 
-    ()
+  (Snack.main ())
+  handle 
+    Snack.ValidationError => ()  
+    | Cli.UnknownTemplate => print "Unknown template...\n\nTemplates:\n  cli\n  compiler\n\n"
+    | e => (print "Unknown error occurred...\n\t"; raise e)

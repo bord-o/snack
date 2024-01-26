@@ -1,7 +1,12 @@
 signature CLI =
 sig
-  type config = {path: string}
   datatype snackOp = Init | Watch
+  datatype template = Cli | Compiler
+
+  exception UnknownTemplate
+
+  type config = {path: string, template_type : template}
+
   val show: snackOp -> string
   (* where to watch for file changes. Later this will include the template type *)
   (* get the usage message when a user messes up *)

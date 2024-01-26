@@ -2,20 +2,29 @@ structure Cli :> CLI =
 struct
   open GetOpt
   datatype snackOp = Init | Watch
+  datatype template = Cli | Compiler
 
-  type config = {path: string}
+  type config = {path: string, template_type : template}
 
   val current_path = ref ""
+  val template_type = ref Cli
+
+
+  exception UnknownTemplate
 
   val order = REQUIRE_ORDER
-  val init_flag = NO_ARG (fn () => Init)
+  (*(if s="cli" then Cli else if s = "compiler" then Compiler else raise
+  * UnknownTemplate)*)
+  val init_flag = REQ_ARG ((fn s => (template_type := (if s="cli" then Cli else if s = "compiler" then Compiler else 
+     raise UnknownTemplate
+    ); Init)), "TEMPLATE")
   val watch_flag = REQ_ARG ((fn s => (current_path := s; Watch)), "PATH")
 
   val (opt_descs: snackOp opt_descr list) =
     [ { short = [#"i"]
       , long = ["init"]
       , arg = init_flag
-      , desc = "Initialize a project."
+      , desc = "Initialize a project (cli, compiler)"
       }
     , { short = [#"w"]
       , long = ["watch"]
@@ -57,7 +66,7 @@ struct
         if List.length args = 0 then Invalid
         else if List.length err <> 0 then Invalid
         else if List.length non <> 0 then Invalid
-        else Valid {path = !current_path}
+        else Valid {path = !current_path, template_type = !template_type}
     in
       case valid of
         Valid cfg => (SOME (List.hd res, cfg))
