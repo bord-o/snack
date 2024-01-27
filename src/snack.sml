@@ -56,8 +56,8 @@ struct
           val mainFile = TextIO.openOut "./src/main.sml"
           val mlbFile = TextIO.openOut "./src/main.mlb"
           val makeFile = TextIO.openOut "./makefile"
-          val grmFile = TextIO.openOut "./src/main.lex"
-          val lexFile = TextIO.openOut "./src/main.grm"
+          val grmFile = TextIO.openOut "./src/main.grm"
+          val lexFile = TextIO.openOut "./src/main.lex"
         in
           (  print "Creating Compiler template...\n\n"
           ; TextIO.output (mainFile, Templates.Compiler.mainFile)
