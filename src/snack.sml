@@ -35,11 +35,13 @@ struct
           val () = FS.mkDir "./src";
           val mainFile = TextIO.openOut "./src/main.sml"
           val mlbFile = TextIO.openOut "./src/main.mlb"
+          val buildFile = TextIO.openOut "./src/build.sml"
           val makeFile = TextIO.openOut "./makefile"
         in
           (  print "Creating CLI template...\n\n"
           ; TextIO.output (mainFile, Templates.Cli.mainFile)
           ; TextIO.output (mlbFile, Templates.Cli.mlbFile)
+          ; TextIO.output (buildFile, Templates.Cli.buildFile)
           ; TextIO.output ( makeFile, Templates.Cli.makeFile)
 
           ; TextIO.closeOut mainFile

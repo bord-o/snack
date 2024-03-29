@@ -1,9 +1,10 @@
 structure Templates = struct
 
   structure Cli = struct
-    val mainFile ="val _ = print \"Hello World!\""
-    val mlbFile = "local $(SML_LIB)/basis/basis.mlb\nin\nmain.sml\nend"
-    val makeFile = "run: build\n\tchmod +x ./_build/main && cd ./_build &&./main\nbuild:\n\tmlkit --output ./_build/main ./src/main.mlb"
+    val mainFile ="fun main args = print \"Hello World!\""
+    val mlbFile = "local \nin\nmain.sml\nend"
+    val buildFile = "app use [\"src/main.sml\"]"
+    val makeFile = "run: build\n\tchmod +x ./_build/main && cd ./_build &&./main\nbuild:\n\tpolyc ./src/build.sml -o ./_build/main"
 
   end
 
